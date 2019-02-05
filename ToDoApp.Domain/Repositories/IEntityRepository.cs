@@ -7,8 +7,8 @@ namespace ToDoApp.Domain.Repositories
     {
         IEnumerable<T> GetAll();
         T GetSingle(int id);
-        void Add(T entity);
-        void Edit(T entity);
-        void Delete(T entity);
+        RepositoryResult Add(T entity);
+        RepositoryResult Edit(T entity);
+        RepositoryResult Delete(T entity);
     }
 }

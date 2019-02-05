@@ -1,14 +1,18 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Threading.Tasks;
+using Autofac;
+using Autofac.Extensions.DependencyInjection;
+using AutofacSerilogIntegration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Serilog;
+using ToDoApp.Domain.Repositories;
+using ToDoApp.Infrastructure;
+using ToDoApp.Infrastructure.Repositories;
 
 namespace ToDoApp.Web
 {
@@ -22,7 +26,7 @@ namespace ToDoApp.Web
         public IConfiguration Configuration { get; }
 
         // This method gets called by the runtime. Use this method to add services to the container.
-        public void ConfigureServices(IServiceCollection services)
+        public IServiceProvider ConfigureServices(IServiceCollection services)
         {
             services.Configure<CookiePolicyOptions>(options =>
             {
@@ -31,8 +35,27 @@ namespace ToDoApp.Web
                 options.MinimumSameSitePolicy = SameSiteMode.None;
             });
 
-
+            services.AddDbContext<AppDbContext>(options =>
+                options.UseSqlServer(Configuration.GetConnectionString("DefaultConnection")));
             services.AddMvc().SetCompatibilityVersion(CompatibilityVersion.Version_2_1);
+
+            //serilog cfg
+            var loggerConfiguration = new LoggerConfiguration()
+                .WriteTo.File("log.txt")
+                .CreateLogger();
+
+            //autofac
+            var builder = new ContainerBuilder();
+            builder.Populate(services);
+            builder.RegisterGeneric(typeof(EntityRepository<>)).As(typeof(IEntityRepository<>))
+                .InstancePerLifetimeScope();
+
+            // serilog register
+            builder.RegisterLogger(loggerConfiguration);
+
+            var container = builder.Build();
+
+            return new AutofacServiceProvider(container);
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

@@ -1,4 +1,6 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using ToDoApp.Domain.Entities;
 using ToDoApp.Domain.Repositories;
 
@@ -6,29 +8,61 @@ namespace ToDoApp.Infrastructure.Repositories
 {
     public class EntityRepository<T> : IEntityRepository<T> where T : class, IEntity
     {
-        public void Add(T entity)
+        private AppDbContext _context;
+
+        public EntityRepository(AppDbContext context)
         {
-            throw new System.NotImplementedException();
+            _context = context;
         }
 
-        public void Delete(T entity)
+        public RepositoryResult Add(T entity)
         {
-            throw new System.NotImplementedException();
+            _context.Set<T>().Add(entity);
+            var result = Save();
+
+            return result;
         }
 
-        public void Edit(T entity)
+        public RepositoryResult Delete(T entity)
         {
-            throw new System.NotImplementedException();
+            _context.Set<T>().Remove(entity);
+            var result = Save();
+
+            return result;
+        }
+
+        public RepositoryResult Edit(T entity)
+        {
+            _context.Set<T>().Update(entity);
+            var result = Save();
+
+            return result;
         }
 
         public IEnumerable<T> GetAll()
         {
-            throw new System.NotImplementedException();
+            return _context.Set<T>();
         }
 
         public T GetSingle(int id)
         {
-            throw new System.NotImplementedException();
+            return _context.Set<T>().FirstOrDefault(x => x.Id == id);
+        }
+
+        private RepositoryResult Save()
+        {
+            RepositoryResult result = new RepositoryResult("Database updated successfully");
+            try
+            {
+                _context.SaveChanges();
+            }
+            catch (Exception e)
+            {
+                result.RepositoryStatus = RepositoryResultStatus.Error;
+                result.Message = e.Message;
+            }
+
+            return result;
         }
     }
 }
