@@ -1,8 +1,6 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Diagnostics;
 using System.Linq;
-using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
 using Serilog;
 using ToDoApp.Domain.Entities;
@@ -15,7 +13,7 @@ namespace ToDoApp.Web.Controllers
     {
         private IEntityRepository<Category> _catRepository;
         private IEntityRepository<Memento> _memRepository;
-        private ILogger _logger;
+        private readonly ILogger _logger;
 
         public HomeController(IEntityRepository<Category> catRepository,
             IEntityRepository<Memento> memRepository, ILogger logger)
@@ -27,7 +25,20 @@ namespace ToDoApp.Web.Controllers
 
         public IActionResult Index()
         {
-            return View();
+            var memModel = new MemoVM();
+            foreach (var cat in _catRepository.GetAll())
+            {
+                memModel.ToDoList.Add(cat,new List<Memento>());
+                if (_memRepository.GetAll().Any(x => x.CategoryId == cat.Id))
+                {
+                    foreach (var mem in _memRepository.GetAll().Where(x => x.CategoryId == cat.Id))
+                    {
+                        memModel.ToDoList[cat].Add(mem);
+                    }
+                }
+            }
+            
+            return View(memModel);
         }
 
         public IActionResult About()
