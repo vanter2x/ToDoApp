@@ -4,13 +4,27 @@ using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using Microsoft.AspNetCore.Mvc;
+using Serilog;
+using ToDoApp.Domain.Entities;
+using ToDoApp.Domain.Repositories;
 using ToDoApp.Web.Models;
 
 namespace ToDoApp.Web.Controllers
 {
     public class HomeController : Controller
     {
-        
+        private IEntityRepository<Category> _catRepository;
+        private IEntityRepository<Memento> _memRepository;
+        private ILogger _logger;
+
+        public HomeController(IEntityRepository<Category> catRepository,
+            IEntityRepository<Memento> memRepository, ILogger logger)
+        {
+            _catRepository = catRepository;
+            _memRepository = memRepository;
+            _logger = logger;
+        }
+
         public IActionResult Index()
         {
             return View();
