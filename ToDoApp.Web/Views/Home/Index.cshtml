@@ -7,12 +7,17 @@
 <h2>Index</h2>
 @foreach (var item in Model.ToDoList)
 {
-    <button>@item.Key.Name</button>
-    foreach (var mem in item.Value)
-    {
-        @mem.Text
-    }
-    <br/>
+    <div class=" text-right img-rounded ">
+        <div class="panel panel-default">
+            <div class="panel-heading text-left">@item.Key.Name</div>
+            @foreach (var mem in item.Value)
+            {
+                <div class="panel-body text-left post-detail @mem.Done" id="memText">@mem.Text
+                    <input type="checkbox" id ="memDone" class="pull-right @mem.Done" checked="@mem.Done"/>
+                </div>
+            }
+        </div>
+    </div>
 }
 <p>
     <a asp-action="Create">Create New</a>
@@ -23,6 +28,26 @@
             <th></th>
         </tr>
     </thead>
-    <tbody>
-    </tbody>
+    <tbody></tbody>
 </table>
+
+@section Scripts
+{
+    <script>
+        $(function() {
+            var memDone = $("input#memDone");
+            memDone.click(function() {
+                var memText = $(this).parent();
+                var memD = $(this);
+                console.log(memD);
+                if (memText.hasClass('False')) {
+                    memText.removeClass('False');
+                    memText.addClass('True');
+                } else {
+                    memText.removeClass('True');
+                    memText.addClass('False');
+                }
+            })
+        })
+    </script>
+}

@@ -25,27 +25,16 @@ namespace ToDoApp.Web.Controllers
 
         public IActionResult Index()
         {
-            var memModel = new MemoVM();
-            foreach (var cat in _catRepository.GetAll())
-            {
-                memModel.ToDoList.Add(cat,new List<Memento>());
-                if (_memRepository.GetAll().Any(x => x.CategoryId == cat.Id))
-                {
-                    foreach (var mem in _memRepository.GetAll().Where(x => x.CategoryId == cat.Id))
-                    {
-                        memModel.ToDoList[cat].Add(mem);
-                    }
-                }
-            }
+            var memModel = CreateView();
             
             return View(memModel);
         }
 
         public IActionResult About()
         {
-            ViewData["Message"] = "Your application description page.";
+            var memModel = CreateView();
 
-            return View();
+            return View(memModel);
         }
 
         public IActionResult Contact()
@@ -64,6 +53,26 @@ namespace ToDoApp.Web.Controllers
         public IActionResult Error()
         {
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
+        }
+
+        private MemoVM CreateView()
+        {
+            var memModel = new MemoVM();
+
+            foreach (var cat in _catRepository.GetAll())
+            {
+                memModel.ToDoList.Add(cat, new List<Memento>());
+
+                if (_memRepository.GetAll().Any(x => x.CategoryId == cat.Id))
+                {
+                    foreach (var mem in _memRepository.GetAll().Where(x => x.CategoryId == cat.Id))
+                    {
+                        memModel.ToDoList[cat].Add(mem);
+                    }
+                }
+            }
+
+            return memModel;
         }
     }
 }

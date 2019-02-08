@@ -35,3 +35,13 @@ body {
         display: none;
     }
 }
+
+div.False{
+    text-decoration: black;
+    text-decoration: none;
+}
+
+div.True {
+    color: green;
+    text-decoration: line-through;
+}
