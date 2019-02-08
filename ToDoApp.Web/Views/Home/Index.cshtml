@@ -1,32 +1,44 @@
-﻿@model MemoVM
+﻿@model MemosVM
 
 @{
-    ViewData["Title"] = "Index";
+    ViewData["Title"] = "About";
 }
 
-<h2>Index</h2>
-@foreach (var item in Model.ToDoList)
+<h2>About</h2>
+
+@foreach (var item in Model.Categories)
 {
     <div class=" text-right img-rounded ">
         <div class="panel panel-default">
-            <div class="panel-heading text-left">@item.Key.Name</div>
-            @foreach (var mem in item.Value)
+            <div class="panel-heading text-left">
+                @item.Name
+                <button class="pull-right">
+                    @Html.ActionLink("Usuń", "DeleteCategory", new { id = item.Id }, new { @class = "deleteCat" })
+                </button>
+            </div>
+            @foreach (var mem in Model.Mementoes.Where(x => x.CategoryId == item.Id))
             {
-                <div class="panel-body text-left post-detail @mem.Done" id="memText">@mem.Text
-                    <input type="checkbox" id ="memDone" class="pull-right @mem.Done" checked="@mem.Done"/>
-                </div>
+            <div class="panel-body text-left post-detail @mem.Done" id="memText">
+                @mem.Text
+                <button class="pull-right">
+                    @Html.ActionLink("Usuń", "DeleteMemento", new { id = mem.Id }, new { @class = "deleteMem" })
+                </button>
+                <input type="checkbox" id="@mem.Id" class=" memDone @mem.Done" checked="@mem.Done" />
+            </div>
             }
         </div>
     </div>
 }
+
+
 <p>
     <a asp-action="Create">Create New</a>
 </p>
 <table class="table">
     <thead>
-        <tr>
-            <th></th>
-        </tr>
+    <tr>
+        <th></th>
+    </tr>
     </thead>
     <tbody></tbody>
 </table>
@@ -34,9 +46,9 @@
 @section Scripts
 {
     <script>
-        $(function() {
-            var memDone = $("input#memDone");
-            memDone.click(function() {
+        $(function () {
+            var memDone = $("input.memDone");
+            memDone.click(function () {
                 var memText = $(this).parent();
                 var memD = $(this);
                 console.log(memD);
@@ -48,6 +60,15 @@
                     memText.addClass('False');
                 }
             })
+
+            $("body").on("click", "a.deleteMem", function () {
+                if (!confirm("Potwierdzasz usunięcie przypomnienia?"))
+                    return false;
+            });
+            $("body").on("click", "a.deleteCat", function () {
+                if (!confirm("Potwierdzasz usunięcie kategorii?"))
+                    return false;
+            });
         })
     </script>
 }

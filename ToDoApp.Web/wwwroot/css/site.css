@@ -37,11 +37,13 @@ body {
 }
 
 div.False{
+    padding-right: 120px;
     text-decoration: black;
     text-decoration: none;
 }
 
 div.True {
+    padding-right: 120px;
     color: green;
     text-decoration: line-through;
 }

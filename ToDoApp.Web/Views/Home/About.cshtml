@@ -1,4 +1,4 @@
-﻿@model ToDoApp.Web.Models.MemoVM
+﻿@model MemosVM
 
 @{
     ViewData["Title"] = "About";
@@ -6,34 +6,63 @@
 
 <h2>About</h2>
 
-<h4>MemoVM</h4>
-<hr />
-<div class="row">
-    <div class="col-md-4">
-        <form asp-action="About">
-            <div asp-validation-summary="ModelOnly" class="text-danger"></div>
-            @*<div class="form-group">
-                <label asp-for="Title" class="control-label"></label>
-                <input asp-for="Title" class="form-control" />
-                <span asp-validation-for="Title" class="text-danger"></span>
+@foreach (var item in Model.Categories)
+{
+    <div class=" text-right img-rounded ">
+        <div class="panel panel-default">
+            <div class="panel-heading text-left">
+                @item.Name
+                @Html.ActionLink("Usuń", "DeleteCategory", new { id = item.Id }, new { @class = "button" })
             </div>
-            <div class="form-group">
-                <label asp-for="PostText" class="control-label"></label>
-                <textarea asp-for="PostText" class="form-control" id="post-editor"></textarea>
-                <span asp-validation-for="PostText" class="text-danger"></span>
-            </div>*@
-
-            <div class="form-group">
-                <input type="submit" value="Create" class="btn btn-default" />
-            </div>
-        </form>
+            @foreach (var mem in Model.Mementoes.Where(x => x.CategoryId == item.Id))
+            {
+                <div class="panel-body text-left post-detail @mem.Done" id="memText">
+                    @mem.Text
+                    <input type="checkbox" id="@mem.Id" class="pull-right memDone @mem.Done" checked="@mem.Done" />
+                    <button>
+                        @Html.ActionLink("Usuń", "DeleteMemento", new { id = mem.Id }, new { @class = "delete" })
+                        </button>
+</div>
+            }
+        </div>
     </div>
-</div>
+}
 
-<div>
-    <a asp-action="Index">Back to List</a>
-</div>
 
-@section Scripts {
-    @{await Html.RenderPartialAsync("_ValidationScriptsPartial");}
+<p>
+    <a asp-action="Create">Create New</a>
+</p>
+<table class="table">
+    <thead>
+        <tr>
+            <th></th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+</table>
+
+@section Scripts
+    {
+    <script>
+        $(function () {
+            var memDone = $("input.memDone");
+            memDone.click(function () {
+                var memText = $(this).parent();
+                var memD = $(this);
+                console.log(memD);
+                if (memText.hasClass('False')) {
+                    memText.removeClass('False');
+                    memText.addClass('True');
+                } else {
+                    memText.removeClass('True');
+                    memText.addClass('False');
+                }
+            })
+
+            $("body").on("click", "a.delete", function () {
+                if (!confirm("Potwierdzasz usunięcie kategorii"))
+                    return false;
+            });
+        })
+    </script>
 }

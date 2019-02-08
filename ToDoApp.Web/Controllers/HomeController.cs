@@ -25,23 +25,42 @@ namespace ToDoApp.Web.Controllers
 
         public IActionResult Index()
         {
-            var memModel = CreateView();
-            
+            var memModel = new MemosVM();
+            memModel.Categories.AddRange(_catRepository.GetAll());
+            memModel.Mementoes.AddRange(_memRepository.GetAll());
+
             return View(memModel);
         }
 
         public IActionResult About()
         {
-            var memModel = CreateView();
-
-            return View(memModel);
+            
+            return View();
         }
 
-        public IActionResult Contact()
+        
+        public IActionResult DeleteMemento(int id)
         {
-            ViewData["Message"] = "Your contact page.";
+            var memo = _memRepository.GetSingle(id);
+            _memRepository.Delete(memo);
 
-            return View();
+            return RedirectToAction("Index");
+        }
+
+        public IActionResult DeleteCategory(int id)
+        {
+            var category = _catRepository.GetSingle(id);
+            var catMementos = _memRepository.GetAll().Where(x => x.CategoryId == category.Id);
+            if (catMementos != null)
+            {
+                foreach (var memento in catMementos)
+                {
+                    _memRepository.Delete(memento);
+                }
+            }
+            _catRepository.Delete(category);
+
+            return RedirectToAction("Index");
         }
 
         public IActionResult Privacy()
@@ -55,24 +74,6 @@ namespace ToDoApp.Web.Controllers
             return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
 
-        private MemoVM CreateView()
-        {
-            var memModel = new MemoVM();
-
-            foreach (var cat in _catRepository.GetAll())
-            {
-                memModel.ToDoList.Add(cat, new List<Memento>());
-
-                if (_memRepository.GetAll().Any(x => x.CategoryId == cat.Id))
-                {
-                    foreach (var mem in _memRepository.GetAll().Where(x => x.CategoryId == cat.Id))
-                    {
-                        memModel.ToDoList[cat].Add(mem);
-                    }
-                }
-            }
-
-            return memModel;
-        }
+        
     }
 }
