@@ -61,7 +61,7 @@ namespace ToDoApp.Infrastructure.Repositories
                 result.RepositoryStatus = RepositoryResultStatus.Error;
                 result.Message = e.Message;
             }
-
+            
             return result;
         }
     }

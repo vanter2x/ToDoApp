@@ -21,10 +21,14 @@ namespace ToDoApp.Web
                 try
                 {
                     var context = services.GetRequiredService<AppDbContext>();
-                    context.Database.EnsureCreated();
+                    var newDatabase = context.Database.EnsureCreated();
                     var info = DbInitializer.Seed(context);
-                    logger.Information("Database was successfully created.");
-                    logger.Information(info);
+                    if (newDatabase)
+                    {
+                        logger.Information("Database was successfully created.");
+                        logger.Information(info);
+                    }
+                        
                 }
                 catch (Exception ex)
                 {
