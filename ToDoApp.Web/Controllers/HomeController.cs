@@ -38,7 +38,17 @@ namespace ToDoApp.Web.Controllers
             return View();
         }
 
-        
+        public string AddNewCategory(string catName)
+        {
+            var check = _catRepository.GetAll().FirstOrDefault(c => c.Name == catName);
+            if (check != null)
+                return "Exists";
+            Category newCategory = new Category(){Name = catName};
+            _catRepository.Add(newCategory);
+            return "Ok";
+        }
+
+
         public IActionResult DeleteMemento(int id)
         {
             var memo = _memRepository.GetSingle(id);
