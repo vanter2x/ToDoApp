@@ -8,8 +8,8 @@
 
 <div class="new-cat">
     <input type="text" id="newcatname" />
+    <a class="btn btn-primary" href="#" id="newcata">Add new category</a>
     <p>
-        <a href="#" id="newcata">Dodaj Nową Kategorię</a>
         <span class="ajax-text"></span>
     </p>
 </div>
@@ -17,32 +17,33 @@
 
 @foreach (var item in Model.Categories)
 {
-    <div class=" text-right img-rounded ">
-        <div class="panel panel-default">
+    <div>
+        <div class="panel panel-default col-md-4">
             <div class="panel-heading text-left">
                 @item.Name
                 <button class="pull-right">
-                    @Html.ActionLink("Usuń", "DeleteCategory", new { id = item.Id }, new { @class = "deleteCat" })
+                    @Html.ActionLink("Delete", "DeleteCategory", new { id = item.Id }, new { @class = "deleteCat" })
                 </button>
             </div>
             @foreach (var mem in Model.Mementoes.Where(x => x.CategoryId == item.Id))
             {
-                <div class="panel-body text-left post-detail @mem.Done" id="memText">
+                <div class="panel-body text-left @mem.Done" id="memText">
                     @mem.Text
-                    <button class="pull-right">
-                        @Html.ActionLink("Usuń", "DeleteMemento", new { id = mem.Id }, new { @class = "deleteMem" })
+                    <button class="btn pull-right">
+                        @Html.ActionLink("Delete", "DeleteMemento", new { id = mem.Id }, new { @class = "deleteMem" })
                     </button>
-                    <input type="checkbox" id="@mem.Id" class=" memDone @mem.Done" checked="@mem.Done" />
+                    <input type="checkbox" id="@mem.Id" class="memDone @mem.Done" checked="@mem.Done" />
                 </div>
             }
+            <div class="panel-body text-left " id="memText">
+                <div class="new-memento" id="@item.Id">
+                    <input class="memoName_@item.Id" type="text" />
+                    <a class="btn btn-info memoName_@item.Id" id="@item.Id" href="#" onclick="Clicker(this.id)">Add memento</a>
+                </div>
+            </div>
         </div>
     </div>
 }
-
-
-<p>
-    <a asp-action="Create">Create New</a>
-</p>
 <table class="table">
     <thead>
         <tr>
@@ -56,12 +57,12 @@
     {
     <script>
         $(function () {
-            //Chenging memento Done(true/false) 
+            //Chenging memento Done(true/false) and update in Database
             var memDone = $("input.memDone");
+
             memDone.click(function () {
                 var memText = $(this).parent();
                 var memD = $(this);
-                console.log(memD);
                 if (memText.hasClass('False')) {
                     memText.removeClass('False');
                     memText.addClass('True');
@@ -69,7 +70,12 @@
                     memText.removeClass('True');
                     memText.addClass('False');
                 }
+                var urlUpdate = "/Home/UpdateMemento";
+                var id = memD.attr("id");
+                var done = memText.hasClass('True');
+                $.post(urlUpdate, { id: id, done: done });
             })
+
 
             //Delete confirm
             $("body").on("click", "a.deleteMem", function () {
@@ -98,7 +104,7 @@
                 var catName = newCatTextInput.val();
 
                 if (catName.length < 2) {
-                    alert("Nazwa kategorii musi mieć conajmniej 2 znaki!");
+                    alert("Name of category must have min. 2 characters");
                     return false;
                 }
 
@@ -126,5 +132,27 @@
                     })
             })
         })
+
+        function Clicker(clicked_id) {
+            //Add new Memento
+            var catId = clicked_id;
+            var inputName = "input.memoName_".concat(catId);
+            var newMemTextInput = $(inputName);
+
+            var memName = newMemTextInput.val();
+
+            if (memName.length < 2) {
+                alert("Name of memento must have min. 2 characters");
+                return false;
+            }
+
+            var url = "/Home/AddNewMemento";
+
+            $.post(url,
+                { memName: memName, catId: catId },
+                function () {
+                    location.reload();
+                })
+        }
     </script>
 }

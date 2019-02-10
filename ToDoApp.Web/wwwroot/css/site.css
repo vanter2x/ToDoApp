@@ -37,13 +37,22 @@ body {
 }
 
 div.False{
-    padding-right: 120px;
     text-decoration: black;
     text-decoration: none;
 }
 
 div.True {
-    padding-right: 120px;
     color: green;
     text-decoration: line-through;
+}
+
+div.panel{
+    padding: 0px;
+    margin: 0px;
+}
+div.panel-default {
+    margin-bottom: 10px;
+}
+div.panel-body{
+    padding-bottom: 0px;
 }

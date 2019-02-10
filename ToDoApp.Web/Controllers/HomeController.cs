@@ -32,12 +32,33 @@ namespace ToDoApp.Web.Controllers
             return View(memModel);
         }
 
-        public IActionResult About()
+        [HttpPost]
+        public IActionResult UpdateMemento(int id, bool done)
         {
-            
-            return View();
+            var memento = _memRepository.GetSingle(id);
+            memento.Done = done;
+            var result = _memRepository.Edit(memento);
+
+            _logger.Information(result.Message);
+
+            return Ok();
         }
 
+        [HttpPost]
+        public ActionResult AddNewMemento(string memName, int catId)
+        {
+            Memento memento = new Memento()
+            {
+                CategoryId = catId,
+                Text = memName
+            };
+
+            _memRepository.Add(memento);
+
+            return Ok();
+        }
+
+        [HttpPost]
         public string AddNewCategory(string catName)
         {
             var check = _catRepository.GetAll().FirstOrDefault(c => c.Name == catName);
